@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Review Portal</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; background: #f8fafc; color: #1e293b; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+    th, td { padding: 12px; border: 1px solid #cbd5e1; text-align: left; }
+    th { background: #f1f5f9; }
+    .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; color: white; margin-right: 5px; }
+    .btn-approve { background: #16a34a; }
+    .btn-reject { background: #dc2626; }
+    .nav { text-align: center; margin-bottom: 20px; }
+    .nav a { margin: 0 10px; color: #2563eb; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <a href="/">Register</a> |
+    <a href="/status-page">Track Status</a> |
+    <a href="/admin-page">Admin Portal</a>
+  </div>
+  <h2>Beneficiary Applications Directory</h2>
+  <button onclick="loadRecords()" style="padding: 8px 16px; margin-bottom: 10px;">Refresh Records</button>
+  <table>
+    <thead>
+      <tr>
+        <th>Ref ID</th>
+        <th>Full Name</th>
+        <th>National ID</th>
+        <th>Scheme</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="recordsBody"></tbody>
+  </table>
+  <script>
+    async function loadRecords() {
+      const res = await fetch("/api/admin/records");
+      const records = await res.json();
+      const tbody = document.getElementById("recordsBody");
+      tbody.innerHTML = "";
+      records.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.reference_id}</td>
+          <td>${r.full_name}</td>
+          <td>${r.national_id}</td>
+          <td>${r.scheme}</td>
+          <td><strong>${r.status}</strong></td>
+          <td>
+            <button class="btn btn-approve" onclick="updateDecision('${r.reference_id}', 'APPROVED')">Approve</button>
+            <button class="btn btn-reject" onclick="updateDecision('${r.reference_id}', 'REJECTED')">Reject</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    async function updateDecision(refId, status) {
+      await fetch(`/api/admin/verify/${refId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      });
+      loadRecords();
+    }
+    loadRecords();
+  </script>
+</body>
+</html>

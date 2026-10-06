@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Beneficiary Registration</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; background: #f8fafc; color: #1e293b; }
+    .card { background: white; padding: 24px; border-radius: 8px; max-width: 500px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin: auto; }
+    input, select, button { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 16px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; }
+    button { background: #2563eb; color: white; border: none; font-weight: bold; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
+    .nav { text-align: center; margin-bottom: 20px; }
+    .nav a { margin: 0 10px; color: #2563eb; text-decoration: none; font-weight: 500; }
+    #msg { padding: 10px; display: none; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <a href="/">Register</a> |
+    <a href="/status-page">Track Status</a> |
+    <a href="/admin-page">Admin Portal</a>
+  </div>
+  <div class="card">
+    <h2>Beneficiary Registration</h2>
+    <div id="msg"></div>
+    <form id="regForm">
+      <label>Full Name</label>
+      <input type="text" id="full_name" required>
+      <label>Email Address</label>
+      <input type="email" id="email" required>
+      <label>Phone Number</label>
+      <input type="text" id="phone" required>
+      <label>National ID / Aadhaar</label>
+      <input type="text" id="national_id" required>
+      <label>Benefit Scheme</label>
+      <select id="scheme" required>
+        <option value="Education Grant">Education Grant</option>
+        <option value="Healthcare Assistance">Healthcare Assistance</option>
+        <option value="Rural Housing Subsidy">Rural Housing Subsidy</option>
+      </select>
+      <button type="submit" id="submitBtn">Submit Application</button>
+    </form>
+  </div>
+  <script>
+    document.getElementById("regForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        full_name: document.getElementById("full_name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        national_id: document.getElementById("national_id").value,
+        scheme: document.getElementById("scheme").value
+      };
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      const msg = document.getElementById("msg");
+      msg.style.display = "block";
+      if (res.ok) {
+        msg.style.background = "#dcfce7";
+        msg.style.color = "#15803d";
+        msg.innerHTML = `<strong>Success!</strong> Reference ID: <b>${data.reference_id}</b>`;
+        document.getElementById("regForm").reset();
+      } else {
+        msg.style.background = "#fee2e2";
+        msg.style.color = "#b91c1c";
+        msg.innerText = data.detail || "Submission failed";
+      }
+    });
+  </script>
+</body>
+</html>

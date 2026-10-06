@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Application Status</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; background: #f8fafc; color: #1e293b; }
+    .card { background: white; padding: 24px; border-radius: 8px; max-width: 500px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin: auto; }
+    input, button { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 16px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; }
+    button { background: #2563eb; color: white; border: none; font-weight: bold; cursor: pointer; }
+    .nav { text-align: center; margin-bottom: 20px; }
+    .nav a { margin: 0 10px; color: #2563eb; text-decoration: none; }
+    #result { margin-top: 15px; padding: 12px; border-radius: 4px; display: none; }
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <a href="/">Register</a> |
+    <a href="/status-page">Track Status</a> |
+    <a href="/admin-page">Admin Portal</a>
+  </div>
+  <div class="card">
+    <h2>Track Application Status</h2>
+    <input type="text" id="refId" placeholder="Enter Reference ID (e.g., BEN-XXXXX)" required>
+    <button onclick="checkStatus()" id="searchBtn">Lookup Status</button>
+    <div id="result"></div>
+  </div>
+  <script>
+    async function checkStatus() {
+      const ref = document.getElementById("refId").value.trim();
+      const resDiv = document.getElementById("result");
+      if(!ref) return;
+      const res = await fetch(`/api/status/${ref}`);
+      const data = await res.json();
+      resDiv.style.display = "block";
+      if(res.ok) {
+        resDiv.style.background = "#eff6ff";
+        resDiv.style.color = "#1e3a8a";
+        resDiv.innerHTML = `<p><b>Name:</b> ${data.full_name}</p>
+                            <p><b>Scheme:</b> ${data.scheme}</p>
+                            <p><b>Status:</b> <span style="font-weight:bold; color: #0284c7;">${data.status}</span></p>`;
+      } else {
+        resDiv.style.background = "#fee2e2";
+        resDiv.style.color = "#b91c1c";
+        resDiv.innerText = data.detail || "Record not found.";
+      }
+    }
+  </script>
+</body>
+</html>
