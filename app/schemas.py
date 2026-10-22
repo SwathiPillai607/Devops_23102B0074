@@ -1,29 +1,52 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
+from typing import Optional, List
 from datetime import datetime
 
-# Schema for incoming registration data
-class BeneficiaryCreate(BaseModel):
-    full_name: str = Field(..., min_length=2, max_length=100)
+# --- Auth Schemas ---
+class UserCreate(BaseModel):
+    username: str
     email: EmailStr
-    phone: str = Field(..., min_length=10, max_length=15)
-    national_id: str = Field(..., min_length=4, max_length=50)
-    scheme: str = Field(..., min_length=2, max_length=100)
+    password: str
+    role: Optional[str] = "USER"
 
-# Schema for returning beneficiary details
-class BeneficiaryResponse(BaseModel):
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class UserOut(BaseModel):
     id: int
+    username: str
+    email: EmailStr
+    role: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    role: str
+    username: str
+
+# --- Beneficiary Schemas ---
+class BeneficiaryCreate(BaseModel):
+    full_name: str
+    email: EmailStr
+    phone: str
+    national_id: str
+    scheme: str
+
+class BeneficiaryStatusUpdate(BaseModel):
+    status: str
+
+class BeneficiaryResponse(BaseModel):
     reference_id: str
     full_name: str
-    email: str
+    email: EmailStr
     phone: str
     national_id: str
     scheme: str
     status: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
-
-# Schema for admin updating status
-class StatusUpdate(BaseModel):
-    status: str = Field(..., pattern="^(APPROVED|REJECTED)$")
+    model_config = {"from_attributes": True}
