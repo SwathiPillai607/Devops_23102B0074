@@ -28,27 +28,22 @@ def health_check():
 # --- Web UI Routes ---
 @app.get("/", response_class=HTMLResponse)
 def index_page(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="index.html")
 
 @app.get("/login", response_class=HTMLResponse)
-def user_login_page(request: Request):
-    return templates.TemplateResponse("user_login.html", {"request": request})
+def login_page(request: Request):
+    return templates.TemplateResponse(request=request, name="index.html")
 
+@app.get("/admin", response_class=HTMLResponse)
+@app.get("/admin-page", response_class=HTMLResponse)
 @app.get("/admin/login", response_class=HTMLResponse)
-def admin_login_page(request: Request):
-    return templates.TemplateResponse("admin_login.html", {"request": request})
-
-@app.get("/user/dashboard", response_class=HTMLResponse)
-def user_dashboard(request: Request):
-    return templates.TemplateResponse("user_dashboard.html", {"request": request})
-
 @app.get("/admin/dashboard", response_class=HTMLResponse)
-def admin_dashboard(request: Request):
-    return templates.TemplateResponse("admin_dashboard.html", {"request": request})
+def admin_page(request: Request):
+    return templates.TemplateResponse(request=request, name="admin.html")
 
 @app.get("/status-page", response_class=HTMLResponse)
 def status_page(request: Request):
-    return templates.TemplateResponse("status.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="status.html")
 
 # --- Authentication API ---
 @app.post("/api/auth/register", response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED, tags=["Auth"])
